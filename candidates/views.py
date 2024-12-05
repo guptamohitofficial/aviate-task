@@ -22,10 +22,13 @@ class CandidateViewSet(viewsets.ModelViewSet):
             q_objects = Q()
             for term in search_terms:
                 q_objects |= Q(name__icontains=term)
+            # Filtering for search terms
             queryset = queryset.filter(q_objects)
+            # Getting matching score for original search string
             queryset = queryset.annotate(
                 sequence_match=Cast(Q(name__icontains=query), IntegerField())
             )
+            # Getting matching score for each word in original search string
             queryset = queryset.annotate(
                 total_relevancy=sum(
                     Cast(Q(name__icontains=term), IntegerField()) 
